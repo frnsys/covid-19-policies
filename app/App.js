@@ -1,10 +1,12 @@
 import sheet from './Sheet';
 import React, {Component} from 'react';
+import ReactTooltip from 'react-tooltip'
 import {BrowserRouter as Router, Route, Link} from 'react-router-dom';
 
 const TITLE = 'COVID-19 Policy Response';
 const SPREADSHEET_ID = '14bQKgxOJdEFdaXuOj9HEaQlkxC1VvmK35zlWx3rmuYc';
 const SPREADSHEET_NUM = 1;
+const MAX_SUMMARY_LENGTH = 60;
 
 function slugify(str) {
   return str.toLowerCase()
@@ -40,6 +42,10 @@ class App extends Component {
       this.setState({ columns, table });
     });
     this.setState({ columns, table });
+  }
+
+  componentDidUpdate() {
+     ReactTooltip.rebuild();
   }
 
   updateFilter(filter) {
@@ -93,9 +99,12 @@ class App extends Component {
       <Router>
         <Route path='/' render={(props) => (
           <div>
+            <ReactTooltip
+              className="tooltip"
+              arrowColor="transparent"
+            />
             <header>
               <h1>COVID-19 Policy Response</h1>
-
               <div id="results-meta">
                 <span className="n-results">{this.state.table.filter((r) => r.visible).length} results</span>
                 <a className="download-results" onClick={() => this.downloadCsv()}>Download as CSV</a>
@@ -120,6 +129,12 @@ class App extends Component {
                             .filter((url) => url.length > 0)
                             .map((url, i) => <a className="ref" href={url} key={i}>{domain(url)}</a>)
                           return <td key={j}>{val}</td>
+                        } else if (c == 'summary') {
+                          let val = r[c];
+                          if (val.length > MAX_SUMMARY_LENGTH) {
+                            val = `${val.substring(0, MAX_SUMMARY_LENGTH)}...`;
+                          }
+                          return <td data-tip={r[c]} key={j}>{val}</td>
                         } else {
                           return <td key={j}>{r[c]}</td>
                         }
