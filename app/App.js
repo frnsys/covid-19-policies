@@ -30,7 +30,8 @@ class App extends Component {
     this.state = {
       filter: '',
       sort: null,
-      sortReverse: false
+      sortReverse: false,
+      collapsed: []
     };
   }
 
@@ -40,6 +41,7 @@ class App extends Component {
     sheet.load(SPREADSHEET_ID, SPREADSHEET_NUM, rows => {
       const columns = Object.keys(rows[0]);
       rows.map(r => {
+        Object.keys(r).forEach((c) => r[c] = r[c].trim());
         r.visible = true;
         table.push(r);
       });
@@ -138,6 +140,23 @@ class App extends Component {
     document.body.removeChild(link);
   }
 
+  collapseColumn(ev, column) {
+    let collapsed = this.state.collapsed;
+    collapsed.push(column);
+    this.setState({ collapsed });
+    ev.preventDefault();
+    ev.stopPropagation();
+  }
+
+  expandColumn(column) {
+    let collapsed = this.state.collapsed;
+    let idx = collapsed.indexOf(column);
+    if (idx >= 0) {
+      collapsed.splice(idx, 1);
+    }
+    this.setState({ collapsed });
+  }
+
   render() {
     return (
       <Router>
@@ -164,15 +183,27 @@ class App extends Component {
                   <tr>{this.state.columns.map((c, i) => {
                     let sorting = this.state.sort == c;
                     return <th key={i}
-                        onClick={() => this.setSort(c)}
                         className={sorting ? 'sorting' : ''}>
-                          {c}{sorting ? (this.state.sortReverse ? ' ▾' : ' ▴') : ''}
+                          {this.state.collapsed.includes(c) ?
+                            <div className="column-expand"
+                              data-tip={c}
+                              data-place="bottom"
+                              data-offset="{'top': 15}"
+                              onClick={() => this.expandColumn(c)}>▸</div>
+                            :
+                            <div onClick={() => this.setSort(c)}>
+                              {c}{sorting ? (this.state.sortReverse ? ' ▾' : ' ▴') : ''}
+                              <div className="column-collapse"
+                                onClick={(ev) => this.collapseColumn(ev, c)}>◂</div>
+                            </div>}
                         </th>
                   })}</tr>
                   {this.state.table.filter((r) => r.visible).map((r, i) => (
                     <tr key={i}>{
                       this.state.columns.map((c, j) => {
-                        if (c == 'references') {
+                        if (this.state.collapsed.includes(c)) {
+                          return <td key={j}></td>
+                        } else if (c == 'references') {
                           let val = r[c].split('\n')
                             .filter((url) => url.length > 0)
                             .map((url, i) => <a className="ref" href={url} key={i}>{domain(url)}</a>)
