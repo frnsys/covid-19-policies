@@ -52,7 +52,10 @@ class App extends Component {
           <div>
             <header>
               <h1>COVID-19 Policy Response</h1>
-              <input autoFocus placeholder="Search or filter" type="text" onChange={(ev) => this.updateFilter(ev.target.value)} />
+              <div id="search-filter">
+                <input autoFocus placeholder="Search or filter" type="text" onChange={(ev) => this.updateFilter(ev.target.value)} />
+                <div className="n-results">{this.state.table.filter((r) => r.visible).length} results</div>
+              </div>
             </header>
             <Route path='/' exact render={() => (
               <table>
