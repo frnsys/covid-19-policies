@@ -7,6 +7,7 @@ const TITLE = 'COVID-19 Policy Response';
 const SPREADSHEET_ID = '14bQKgxOJdEFdaXuOj9HEaQlkxC1VvmK35zlWx3rmuYc';
 const SPREADSHEET_NUM = 1;
 const MAX_SUMMARY_LENGTH = 60;
+const DEFAULT_COLLAPSED = ['summary', 'duration', 'date', 'branch', 'level', 'sector'];
 const SEARCH_HELP = `
 Use quotes to combine terms, e.g. "criminal justice".
 <br />
@@ -31,7 +32,7 @@ class App extends Component {
       filter: '',
       sort: null,
       sortReverse: false,
-      collapsed: []
+      collapsed: DEFAULT_COLLAPSED
     };
   }
 
