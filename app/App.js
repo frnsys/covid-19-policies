@@ -70,6 +70,24 @@ class App extends Component {
     this.setState({ table });
   }
 
+  downloadCsv() {
+    let header = 'data:text/csv;charset=utf-8,%EF%BB%BF';
+    let columns = this.state.columns.join(',');
+    let content = this.state.table.map((r) => (
+      // Quote values, escape existing double quotes
+      this.state.columns.map((c) => `"${r[c].trim().replace(/"/g, '""')}"`).join(',')
+    )).join('\n');
+    let csv = `${columns}\n${content}`;
+    let data = `${header}${encodeURIComponent(csv)}`;
+
+    let link = document.createElement('a');
+    link.setAttribute('href', data);
+    link.setAttribute('download', 'covid19-policies.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
   render() {
     return (
       <Router>
@@ -79,7 +97,7 @@ class App extends Component {
               <h1>COVID-19 Policy Response</h1>
               <div id="search-filter">
                 <input autoFocus placeholder="Search or filter" type="text" onChange={(ev) => this.updateFilter(ev.target.value)} />
-                <div className="n-results">{this.state.table.filter((r) => r.visible).length} results</div>
+                <a onClick={() => this.downloadCsv()} className="n-results">{this.state.table.filter((r) => r.visible).length} results</a>
               </div>
             </header>
             <Route path='/' exact render={() => (
