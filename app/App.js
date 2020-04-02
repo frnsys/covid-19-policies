@@ -7,6 +7,11 @@ const TITLE = 'COVID-19 Policy Response';
 const SPREADSHEET_ID = '14bQKgxOJdEFdaXuOj9HEaQlkxC1VvmK35zlWx3rmuYc';
 const SPREADSHEET_NUM = 1;
 const MAX_SUMMARY_LENGTH = 60;
+const SEARCH_HELP = `
+Use quotes to combine terms, e.g. "criminal justice".
+<br />
+Specify columns like so: "category:telecoms".
+`
 
 function slugify(str) {
   return str.toLowerCase()
@@ -37,7 +42,6 @@ class App extends Component {
       rows.map(r => {
         r.visible = true;
         table.push(r);
-        console.log(r);
       });
       this.setState({ columns, table });
     });
@@ -50,7 +54,26 @@ class App extends Component {
 
   updateFilter(filter) {
     filter = filter.toLowerCase();
-    let parts = filter.match(/(?:[^\s"]+|"[^"]*")+/g);
+    let parts = filter.match(/(?:[^\s"']+|["'][^"']*["'])+/g) || [];
+
+    // Separate into terms (all columns)
+    // and filters (specific columns);
+    let terms = [], filters = {};
+    parts.forEach((p) => {
+      if (p.includes(':')) {
+        let i = p.indexOf(':');
+        let [column, term] = [p.slice(0, i), p.slice(i+1)];
+        if (!(column in filters)) {
+          filters[column] = [];
+        }
+        term = term.replace('*', '[^\s]*'); // Asterisk as wildcard
+        filters[column].push(new RegExp(term));
+      } else {
+        p = p.replace('*', '[^\s]*'); // Asterisk as wildcard
+        terms.push(new RegExp(p));
+      }
+    });
+
     let table = this.state.table;
     table.forEach((r) => {
       // Ignore references column
@@ -59,7 +82,13 @@ class App extends Component {
         .join('\n').toLowerCase();
 
       // By default, AND
-      r.visible = !parts || parts.every((p) => text.includes(p));
+      r.visible = parts.length == 0 || (
+        terms.every((t) => t.test(text))
+        &&
+        Object.keys(filters).every(
+          (c) => filters[c].every(
+            (t) => t.test(r[c].toLowerCase())))
+      );
     });
     this.setState({ table });
   }
@@ -122,16 +151,20 @@ class App extends Component {
               </div>
               <div id="search-filter">
                 <input autoFocus placeholder="Search or filter" type="text" onChange={(ev) => this.updateFilter(ev.target.value)} />
+                <div id="search-help" data-place="left" data-multiline={true} data-tip={SEARCH_HELP}>?</div>
               </div>
             </header>
             <Route path='/' exact render={() => (
               <table>
                 <tbody>
-                  <tr>{this.state.columns.map((c, i) => (
-                    <th key={i}
+                  <tr>{this.state.columns.map((c, i) => {
+                    let sorting = this.state.sort == c;
+                    return <th key={i}
                         onClick={() => this.setSort(c)}
-                        className={this.state.sort == c ? 'sorting' : ''}>{c}</th>
-                  ))}</tr>
+                        className={sorting ? 'sorting' : ''}>
+                          {c}{sorting ? (this.state.sortReverse ? ' ▾' : ' ▴') : ''}
+                        </th>
+                  })}</tr>
                   {this.state.table.filter((r) => r.visible).map((r, i) => (
                     <tr key={i}>{
                       this.state.columns.map((c, j) => {
