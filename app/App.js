@@ -95,9 +95,13 @@ class App extends Component {
           <div>
             <header>
               <h1>COVID-19 Policy Response</h1>
+
+              <div id="results-meta">
+                <span className="n-results">{this.state.table.filter((r) => r.visible).length} results</span>
+                <a className="download-results" onClick={() => this.downloadCsv()}>Download as CSV</a>
+              </div>
               <div id="search-filter">
                 <input autoFocus placeholder="Search or filter" type="text" onChange={(ev) => this.updateFilter(ev.target.value)} />
-                <a onClick={() => this.downloadCsv()} className="n-results">{this.state.table.filter((r) => r.visible).length} results</a>
               </div>
             </header>
             <Route path='/' exact render={() => (
