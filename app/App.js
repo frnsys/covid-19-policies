@@ -21,7 +21,9 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      filter: ''
+      filter: '',
+      sort: null,
+      sortReverse: false
     };
   }
 
@@ -45,6 +47,29 @@ class App extends Component {
     // this.setState({ industries });
   }
 
+  setSort(column) {
+    let reverse = this.state.sortReverse;
+    // Flip sort order
+    // if same column selected again
+    if (this.state.sort == column) {
+      reverse = !reverse;
+    }
+    this.setState({
+      sort: column,
+      sortReverse: reverse
+    });
+    this.applySort(column, reverse);
+  }
+
+  applySort(column, reverse) {
+    let table = this.state.table;
+    table.sort((a, b) => (a[column] > b[column]) ? 1 : -1);
+    if (reverse) {
+      table.reverse();
+    }
+    this.setState({ table });
+  }
+
   render() {
     return (
       <Router>
@@ -60,7 +85,11 @@ class App extends Component {
             <Route path='/' exact render={() => (
               <table>
                 <tbody>
-                  <tr>{this.state.columns.map((c, i) => <th key={i}>{c}</th>)}</tr>
+                  <tr>{this.state.columns.map((c, i) => (
+                    <th key={i}
+                        onClick={() => this.setSort(c)}
+                        className={this.state.sort == c ? 'sorting' : ''}>{c}</th>
+                  ))}</tr>
                   {this.state.table.map((r, i) => (
                     <tr key={i}>{
                       this.state.columns.map((c, j) => {
