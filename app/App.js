@@ -49,8 +49,19 @@ class App extends Component {
   }
 
   updateFilter(filter) {
-    // filter = filter.toLowerCase();
-    // this.setState({ industries });
+    filter = filter.toLowerCase();
+    let parts = filter.match(/(?:[^\s"]+|"[^"]*")+/g);
+    let table = this.state.table;
+    table.forEach((r) => {
+      // Ignore references column
+      let text = this.state.columns
+        .map((c) => c !== 'references' ? r[c] : '')
+        .join('\n').toLowerCase();
+
+      // By default, AND
+      r.visible = !parts || parts.every((p) => text.includes(p));
+    });
+    this.setState({ table });
   }
 
   setSort(column) {
@@ -121,7 +132,7 @@ class App extends Component {
                         onClick={() => this.setSort(c)}
                         className={this.state.sort == c ? 'sorting' : ''}>{c}</th>
                   ))}</tr>
-                  {this.state.table.map((r, i) => (
+                  {this.state.table.filter((r) => r.visible).map((r, i) => (
                     <tr key={i}>{
                       this.state.columns.map((c, j) => {
                         if (c == 'references') {
