@@ -54,6 +54,10 @@ class App extends Component {
 
   updateFilter(filter) {
     filter = filter.toLowerCase();
+    // Could eventually support (nested) parentheses
+    // with a recursive-descent parser
+    // as well as boolean operators (specifically OR, since
+    // AND is the default)
     let parts = filter.match(/(?:[^\s"']+|["'][^"']*["'])+/g) || [];
 
     // Separate into terms (all columns)
