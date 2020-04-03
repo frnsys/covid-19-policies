@@ -179,50 +179,52 @@ class App extends Component {
               </div>
             </header>
             <Route path='/' exact render={() => (
-              <table>
-                <tbody>
-                  <tr>{this.state.columns.map((c, i) => {
-                    let sorting = this.state.sort == c;
-                    return <th key={i}
-                        className={sorting ? 'sorting' : ''}>
-                          {this.state.collapsed.includes(c) ?
-                            <div className="column-expand"
-                              data-tip={c}
-                              data-place="bottom"
-                              data-offset="{'top': 15}"
-                              onClick={() => this.expandColumn(c)}>▸</div>
-                            :
-                            <div onClick={() => this.setSort(c)}>
-                              {c}{sorting ? (this.state.sortReverse ? ' ▾' : ' ▴') : ''}
-                              <div className="column-collapse"
-                                onClick={(ev) => this.collapseColumn(ev, c)}>◂</div>
-                            </div>}
-                        </th>
-                  })}</tr>
-                  {this.state.table.filter((r) => r.visible).map((r, i) => (
-                    <tr key={i}>{
-                      this.state.columns.map((c, j) => {
-                        if (this.state.collapsed.includes(c)) {
-                          return <td key={j}></td>
-                        } else if (c == 'references') {
-                          let val = r[c].split('\n')
-                            .filter((url) => url.length > 0)
-                            .map((url, i) => <a className="ref" href={url} key={i}>{domain(url)}</a>)
-                          return <td key={j}>{val}</td>
-                        } else if (c == 'summary') {
-                          let val = r[c];
-                          if (val.length > MAX_SUMMARY_LENGTH) {
-                            val = `${val.substring(0, MAX_SUMMARY_LENGTH)}...`;
+              <div id="table-container">
+                <table>
+                  <tbody>
+                    <tr>{this.state.columns.map((c, i) => {
+                      let sorting = this.state.sort == c;
+                      return <th key={i}
+                          className={sorting ? 'sorting' : ''}>
+                            {this.state.collapsed.includes(c) ?
+                              <div className="column-expand"
+                                data-tip={c}
+                                data-place="bottom"
+                                data-offset="{'top': 15}"
+                                onClick={() => this.expandColumn(c)}>▸</div>
+                              :
+                              <div onClick={() => this.setSort(c)}>
+                                {c}{sorting ? (this.state.sortReverse ? ' ▾' : ' ▴') : ''}
+                                <div className="column-collapse"
+                                  onClick={(ev) => this.collapseColumn(ev, c)}>◂</div>
+                              </div>}
+                          </th>
+                    })}</tr>
+                    {this.state.table.filter((r) => r.visible).map((r, i) => (
+                      <tr key={i}>{
+                        this.state.columns.map((c, j) => {
+                          if (this.state.collapsed.includes(c)) {
+                            return <td key={j}></td>
+                          } else if (c == 'references') {
+                            let val = r[c].split('\n')
+                              .filter((url) => url.length > 0)
+                              .map((url, i) => <a className="ref" href={url} key={i}>{domain(url)}</a>)
+                            return <td key={j}>{val}</td>
+                          } else if (c == 'summary') {
+                            let val = r[c];
+                            if (val.length > MAX_SUMMARY_LENGTH) {
+                              val = `${val.substring(0, MAX_SUMMARY_LENGTH)}...`;
+                            }
+                            return <td data-tip={r[c]} key={j}>{val}</td>
+                          } else {
+                            return <td key={j}>{r[c]}</td>
                           }
-                          return <td data-tip={r[c]} key={j}>{val}</td>
-                        } else {
-                          return <td key={j}>{r[c]}</td>
-                        }
-                      })
-                    }</tr>
-                  ))}
-                </tbody>
-              </table>
+                        })
+                      }</tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}/>
           </div>
         )}/>
