@@ -202,6 +202,17 @@ function setupGantt(table) {
       .on('mouseenter', mouseEnter)
       .on('mouseout', mouseOut);
 
+  svg.append('g')
+    .selectAll('text')
+    .data(data)
+    .enter()
+      .append('text')
+        .attr('font-size', '0.6em')
+        .attr('x', (d, i) => xScale(d.start) + padding)
+        .attr('y', (d, i) => d.y + barHeight/1.5)
+        .attr('pointer-events', 'none')
+        .text((d, i) => `${d['what'].length > 36 ? `${d['what'].substring(0, 36)}...` : d['what']}`);
+
   const axisSvg = d3.select('#time-axis')
     .append('svg')
       .attr('preserveAspectRatio', 'xMinYMin meet')
@@ -226,6 +237,7 @@ function setupGantt(table) {
     .attr('y1', 0)
     .attr('x2', xScale(today))
     .attr('y2', height+extraPadding)
+    .attr('opacity', 0.5)
     .attr('stroke-width', 2)
     .attr('stroke', 'black');
 }
