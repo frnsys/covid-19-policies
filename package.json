@@ -9,6 +9,8 @@
   "dependencies": {
     "@babel/polyfill": "^7.0.0",
     "color-interpolate": "^1.0.5",
+    "d3": "^5.15.1",
+    "d3-time-format": "^2.2.3",
     "mapbox-gl": "^1.9.1",
     "react": "^15.4.1",
     "react-dom": "^15.4.1",

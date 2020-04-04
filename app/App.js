@@ -1,5 +1,6 @@
 import sheet from './Sheet';
 import setupMap from './Map';
+import setupGantt from './Gantt';
 import React, {Component} from 'react';
 import ReactTooltip from 'react-tooltip'
 import {BrowserRouter as Router, Route, Link} from 'react-router-dom';
@@ -64,8 +65,8 @@ class App extends Component {
         r.visible = true;
         table.push(r);
       });
-      console.log(states);
       setupMap(states);
+      setupGantt(table);
       this.setState({ columns, table });
     });
     this.setState({ columns, table });
