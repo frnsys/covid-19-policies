@@ -23,12 +23,6 @@ function slugify(str) {
     .replace(/\-+/g, '_');          // replace - with single _
 }
 
-// Parse states. Expects them to be two characters
-const stateRe = /[^A-Z]?([A-Z]{2})[^A-Z]?/g;
-function parseStates(location) {
-  return Array.from(location.matchAll(stateRe), m => m[1]);
-}
-
 function domain(url) {
   return url.split('//')[1].split('/')[0].replace(/^www./, '');
 }
@@ -47,25 +41,15 @@ class App extends Component {
   componentWillMount() {
     const table = [];
     const columns = [];
-    const states = {};
     sheet.load(SPREADSHEET_ID, SPREADSHEET_NUM, rows => {
       const columns = Object.keys(rows[0]);
       rows.map(r => {
         // Clean up
         Object.keys(r).forEach((c) => r[c] = r[c].trim());
-
-        // Group by states
-        parseStates(r['location']).forEach((state) => {
-          if (!(state in states)) {
-            states[state] = [];
-          }
-          states[state].push(r);
-        });
-
         r.visible = true;
         table.push(r);
       });
-      setupMap(states);
+      setupMap(table);
       setupGantt(table);
       this.setState({ columns, table });
     });

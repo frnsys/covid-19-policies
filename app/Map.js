@@ -6,6 +6,7 @@ mapboxgl.accessToken = config.MAPBOX_TOKEN;
 
 
 const TOOLTIP = document.getElementById('map-tooltip');
+const CONTROL = document.getElementById('map-control');
 const COLOR_MAP = interpolate(['#AFBCE7', '#3246B8']);
 const CODES = [
   'AK', 'AL', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE',
@@ -17,12 +18,110 @@ const CODES = [
   'WI', 'WY', 'PR', 'AS', 'GU', 'MP', 'VI'
 ];
 
-function setupMap(data) {
-  let counts = Object.keys(data).reduce((acc, state) => {
-    acc[state] = data[state].length;
+// Parse states. Expects them to be two characters
+const stateRe = /[^A-Z]?([A-Z]{2})[^A-Z]?/g;
+function parseStates(location) {
+  return Array.from(location.matchAll(stateRe), m => m[1]);
+}
+
+function setData(map, states, key) {
+  // Match on state code, property "STUSPS" in the layer
+  let expression = ['match', ['get', 'STUSPS']];
+
+  let max = Object.values(states)
+    .reduce((max, cur) => cur[key] > max ? cur[key] : max, 0);
+  CODES.forEach(function(state) {
+    let count = (states[state] || {})[key] || 0;
+    expression.push(state, COLOR_MAP(max > 0 ? count/max : 0));
+  });
+  expression.push('rgba(0,0,0,0)'); // fallback
+  map.setPaintProperty('states', 'fill-color', expression);
+}
+
+function setupMap(table) {
+  let key = 'all';
+  let categories = table.reduce((acc, r) => {
+    let cat = r['category'];
+    if (!(cat in acc)) {
+      acc[cat] = new Set();
+    }
+    let whats = r['what'].split(',');
+    whats.forEach((w) => {
+      acc[cat].add(w);
+    });
     return acc;
   }, {});
-  let max = Object.values(counts).reduce((max, cur) => cur > max ? cur : max, 0);
+
+  // Setup map controls
+  let catSelect = document.createElement('select');
+  let allOption = document.createElement('option');
+  allOption.value = 'all';
+  allOption.innerText = 'All';
+  catSelect.appendChild(allOption);
+  Object.keys(categories).forEach((c) => {
+    let opt = document.createElement('option');
+    opt.value = c;
+    opt.innerText = c;
+    catSelect.appendChild(opt);
+  });
+  CONTROL.appendChild(catSelect);
+  catSelect.addEventListener('change', (ev) => {
+    while (whatSelect.firstChild) {
+      whatSelect.removeChild(whatSelect.lastChild);
+    }
+    let cat = ev.target.value;
+    let allOption = document.createElement('option');
+    allOption.value = `${cat}.all`;
+    allOption.innerText = 'All';
+    whatSelect.appendChild(allOption);
+
+    categories[cat].forEach((w) => {
+      let opt = document.createElement('option');
+      opt.value = `${cat}.${w}`;
+      opt.innerText = w;
+      whatSelect.appendChild(opt);
+    });
+
+    key = `${cat}.all`
+    setData(map, states, key);
+  });
+
+  let whatSelect = document.createElement('select');
+  allOption = document.createElement('option');
+  allOption.value = '';
+  allOption.innerText = '--';
+  whatSelect.appendChild(allOption);
+  CONTROL.appendChild(whatSelect);
+  whatSelect.addEventListener('change', (ev) => {
+    key = ev.target.value;
+    setData(map, states, key);
+  });
+
+  let states = {};
+  table.forEach((r) => {
+    // Group by states
+    // only include public
+    if (r['sector'].includes('Public')) {
+      parseStates(r['location']).forEach((state) => {
+        if (!(state in states)) {
+          states[state] = {};
+          states[state]['all'] = 0;
+          Object.keys(categories).forEach((c) => {
+            states[state][`${c}.all`] = 0
+            categories[c].forEach((w) => {
+              states[state][`${c}.${w}`] = 0;
+            });
+          });
+        }
+        states[state]['all'] += 1;
+        states[state][`${r['category']}.all`] += 1;
+        let whats = r['what'].split(',');
+        whats.forEach((w) => {
+          states[state][`${r['category']}.${w}`] += 1;
+        });
+      });
+    }
+  });
 
   const map = new mapboxgl.Map({
     container: 'map',
@@ -34,14 +133,7 @@ function setupMap(data) {
   });
 
   map.on('load', () => {
-    // Match on state code, property "STUSPS" in the layer
-    let expression = ['match', ['get', 'STUSPS']];
-    CODES.forEach(function(state) {
-      let count = counts[state] || 0;
-      expression.push(state, COLOR_MAP(count/max));
-    });
-    expression.push('rgba(0,0,0,0)'); // fallback
-    map.setPaintProperty('states', 'fill-color', expression);
+    setData(map, states, key);
   });
 
   map.on('mousemove', (ev) => {
@@ -53,10 +145,9 @@ function setupMap(data) {
       TOOLTIP.innerHTML = feats.map((f) => {
         let props = f.properties;
         let state = props['STUSPS'];
-        console.log(f);
         return `<div class="state-info">
           ${props.NAME}<br />
-          ${counts[state] || 0} policies found.
+          ${(states[state] || {})[key] || 0} policies found.
         </div>`;
       }).join('<br />');
 
