@@ -189,7 +189,6 @@ class App extends Component {
               arrowColor="transparent"
             />
             <header>
-              <h1>COVID-19 Policy Response</h1>
               <div id="results-meta">
                 <span className="n-results">{this.state.table.filter((r) => r.visible).length} results</span>
                 <a className="download-results" onClick={() => this.downloadCsv()}>Download as CSV</a>
