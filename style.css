@@ -1,0 +1,219 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:400,700&display=swap');
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Open Sans', sans-serif;
+}
+
+body {
+  padding: 0 1em 4em 1em;
+}
+
+main {
+  margin: 0 auto;
+}
+
+input {
+  width: 100%;
+  padding: 0.5em 0.4em;
+  border: 1px solid black;
+  font-size: 1.2em;
+}
+
+table {
+  width: 100%;
+  max-width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9em;
+}
+
+th, td {
+  border: 1px solid black;
+}
+td {
+  padding: 0.2em;
+}
+th {
+  border-top: none;
+  cursor: pointer;
+  margin: 0;
+}
+th > div {
+  position: relative;
+  padding: 0.2em;
+}
+th:hover {
+  background: #eee;
+}
+th.sorting {
+  background: blue;
+  color: #fff;
+}
+
+td {
+  white-space: pre-line;
+}
+a.ref {
+  display: block;
+}
+
+#search-filter {
+  position: relative;
+}
+#search-help {
+  position: absolute;
+  top: 0.5em;
+  right: 0.5em;
+  background: #000;
+  color: #fff;
+  padding: 0.1em 0.5em;
+  font-size: 1em;
+  cursor: help;
+}
+
+#results-meta {
+  font-size: 0.8em;
+  text-align: right;
+}
+
+.n-results {
+  color: #555;
+  margin-right: 0.5em;
+}
+.download-results {
+  cursor: pointer;
+}
+.download-results:hover {
+  color: blue;
+}
+
+.tooltip {
+  border-radius: 0 !important;
+  margin: 1em !important;
+  max-width: 240px !important;
+  opacity: 1 !important;
+}
+
+.column-collapse {
+  top: 0;
+  right: 0;
+  color: #ddd;
+  position: absolute;
+  padding: 0.2em 0.25em;
+  height: 100%;
+}
+.column-collapse:hover {
+  color: #888;
+}
+.column-expand {
+  color: #ddd;
+}
+.column-expand:hover {
+  color: #888;
+}
+
+#table-container {
+  overflow: auto;
+  border: 1px solid black;
+  border-top: none;
+  margin: 0em;
+  max-height: 80vh;
+}
+tr:last-child td {
+  border-bottom: none;
+}
+th:first-child, td:first-child {
+  border-left: none;
+}
+th:last-child, td:last-child {
+  border-right: none;
+}
+
+#map-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+#map {
+  height: 400px;
+  width: 100%;
+  border: 1px solid black;
+}
+#map-tooltip {
+  color: #fff;
+  position: absolute;
+  padding: 0.5em;
+  font-size: 0.8em;
+  background: #000;
+  display: none;
+  z-index: 100;
+}
+
+#time-wrapper {
+  position: relative;
+  max-height: 80vh;
+}
+#time {
+  max-height: 80vh;
+  overflow-y: auto;
+}
+#time-chart {
+  overflow: hidden;
+  position: relative;
+  border: 1px solid black;
+}
+#time, #time-axis {
+  padding: 2em;
+}
+#time-tooltip {
+  position: absolute;
+  font-size: 0.8em;
+  pointer-events: none;
+  background: #222;
+  color: #fff;
+  padding: 0.25em;
+  min-width: 280px;
+  display: none;
+}
+#time-tooltip .header {
+  display: flex;
+  justify-content: space-between;
+}
+#time-tooltip .header div:first-child {
+  color: #FFC107;
+}
+#time-tooltip .header div:last-child {
+  padding-left: 1em;
+}
+svg {
+  overflow: visible;
+}
+#time-axis {
+  position: absolute;
+  padding-bottom: 1em;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+section {
+  margin: 2em 0;
+}
+section header h1 {
+  margin-bottom: 0.5em;
+}
+
+h2 {
+  font-size: 1.2em;
+}
+h5 {
+  text-transform: uppercase;
+  margin: 0.5em 0 0 0;
+  color: #aaa;
+}

@@ -114,6 +114,9 @@ function renderData(data, xScale) {
         <div>${start} - ${end}</div>
         <div>${d['location']}</div>
       </div>
+      <h5>Who</h5>
+      <div>${d['who']}</div>
+      <h5>What</h5>
       <div>${d['what'].replace('\n', '<br />')}</div>
     </div>`;
   };
