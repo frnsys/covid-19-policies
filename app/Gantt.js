@@ -80,7 +80,7 @@ function parseEndDates(input) {
 const width = 800;
 const extraPadding = 25;
 
-function renderData(data, xScale) {
+function renderData(data, xScale, all) {
   // Setup y coords
   data.forEach((d, i) => {
     d.y = i * (barHeight + barMargin);
@@ -167,7 +167,14 @@ function renderData(data, xScale) {
         .attr('x', (d, i) => xScale(d.start) + padding)
         .attr('y', (d, i) => d.y + barHeight/1.5)
         .attr('pointer-events', 'none')
-        .text((d, i) => `${d['what'].length > 36 ? `${d['what'].substring(0, 36)}...` : d['what']}`);
+    .text((d, i) => {
+      let desc = d['sector'] == 'Private' ? d['who'] : d['location'];
+      if (all) {
+        return `[${desc}] ${d['what'].length > 36 ? `${d['what'].substring(0, 36)}...` : d['what']}`
+      } else {
+        return `${desc}`;
+      }
+    });
 
   d3.select('#time-axis').selectAll('svg').remove();
   const axisSvg = d3.select('#time-axis')
@@ -299,14 +306,14 @@ function setupGantt(table) {
     let cat = ev.target.value;
     setWhatSelect(cat);
     key = `${cat}.all`
-    renderData(categories[key], xScale);
+    renderData(categories[key], xScale, true);
   });
 
   let whatSelect = document.createElement('select');
   CONTROL.appendChild(whatSelect);
   whatSelect.addEventListener('change', (ev) => {
     key = ev.target.value;
-    renderData(categories[key], xScale);
+    renderData(categories[key], xScale, key.endsWith('.all'));
   });
 
   // Setup axis
@@ -318,7 +325,7 @@ function setupGantt(table) {
 
   // Initial selection
   let key = Object.keys(categories)[0];
-  renderData(categories[key], xScale);
+  renderData(categories[key], xScale, key.endsWith('.all'));
   let cat = key.split('.')[0];
   setWhatSelect(cat);
 }
