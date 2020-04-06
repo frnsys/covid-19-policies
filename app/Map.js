@@ -145,9 +145,10 @@ function setupMap(table) {
       TOOLTIP.innerHTML = feats.map((f) => {
         let props = f.properties;
         let state = props['STUSPS'];
+        let n = (states[state] || {})[key] || 0;
         return `<div class="state-info">
           ${props.NAME}<br />
-          ${(states[state] || {})[key] || 0} policies found.
+          ${n} polic${n == 1 ? 'y' : 'ies'} found.
         </div>`;
       }).join('<br />');
 
