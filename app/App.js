@@ -212,7 +212,11 @@ class App extends Component {
                           } else if (c == 'references') {
                             let val = r[c].split('\n')
                               .filter((url) => url.length > 0)
-                              .map((url, i) => <a className="ref" href={url} key={i}>{domain(url)}</a>)
+                              .map((url, i) => <a className="ref"
+                                key={i}
+                                href={url}
+                                target="_blank"
+                                rel="noopener noreferrer" >{domain(url)}</a>)
                             return <td key={j}>{val}</td>
                           } else if (c == 'summary') {
                             let val = r[c];
