@@ -10,6 +10,10 @@ html, body {
   font-family: 'Open Sans', sans-serif;
 }
 
+a, a:visited {
+  color: #4285F4;
+}
+
 body {
   padding: 0 1em 4em 1em;
 }
@@ -220,4 +224,8 @@ h5 {
 
 #info p {
   max-width: 760px;
+}
+
+#links {
+  color: #aaa;
 }

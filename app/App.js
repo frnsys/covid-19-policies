@@ -3,7 +3,6 @@ import setupMap from './Map';
 import setupGantt from './Gantt';
 import React, {Component} from 'react';
 import ReactTooltip from 'react-tooltip'
-import {BrowserRouter as Router, Route, Link} from 'react-router-dom';
 
 const TITLE = 'COVID-19 Policy Response';
 const SPREADSHEET_ID = '14bQKgxOJdEFdaXuOj9HEaQlkxC1VvmK35zlWx3rmuYc';
@@ -165,78 +164,72 @@ class App extends Component {
 
   render() {
     return (
-      <Router>
-        <Route path='/' render={(props) => (
-          <div>
-            <ReactTooltip
-              className="tooltip"
-              arrowColor="transparent"
-            />
-            <header>
-              <div id="results-meta">
-                <span className="n-results">{this.state.table.filter((r) => r.visible).length} results</span>
-                <a className="download-results" onClick={() => this.downloadCsv()}>Download as CSV</a>
-              </div>
-              <div id="search-filter">
-                <input autoFocus placeholder="Search or filter" type="text" onChange={(ev) => this.updateFilter(ev.target.value)} />
-                <div id="search-help" data-place="left" data-multiline={true} data-tip={SEARCH_HELP}>?</div>
-              </div>
-            </header>
-            <Route path='/' exact render={() => (
-              <div id="table-container">
-                <table>
-                  <tbody>
-                    <tr>{this.state.columns.map((c, i) => {
-                      let sorting = this.state.sort == c;
-                      return <th key={i}
-                          className={sorting ? 'sorting' : ''}>
-                            {this.state.collapsed.includes(c) ?
-                              <div className="column-expand"
-                                data-tip={c}
-                                data-place="bottom"
-                                data-offset="{'top': 15}"
-                                onClick={() => this.expandColumn(c)}>▸</div>
-                              :
-                              <div onClick={() => this.setSort(c)}>
-                                {c}{sorting ? (this.state.sortReverse ? ' ▾' : ' ▴') : ''}
-                                <div className="column-collapse"
-                                  onClick={(ev) => this.collapseColumn(ev, c)}>◂</div>
-                              </div>}
-                          </th>
-                    })}</tr>
-                    {this.state.table.filter((r) => r.visible).map((r, i) => (
-                      <tr key={i}>{
-                        this.state.columns.map((c, j) => {
-                          if (this.state.collapsed.includes(c)) {
-                            return <td key={j}></td>
-                          } else if (c == 'references') {
-                            let val = r[c].split('\n')
-                              .filter((url) => url.length > 0)
-                              .map((url, i) => <a className="ref"
-                                key={i}
-                                href={url}
-                                target="_blank"
-                                rel="noopener noreferrer" >{domain(url)}</a>)
-                            return <td key={j}>{val}</td>
-                          } else if (c == 'summary') {
-                            let val = r[c];
-                            if (val.length > MAX_SUMMARY_LENGTH) {
-                              val = `${val.substring(0, MAX_SUMMARY_LENGTH)}...`;
-                            }
-                            return <td data-tip={r[c]} key={j}>{val}</td>
-                          } else {
-                            return <td key={j}>{r[c]}</td>
-                          }
-                        })
-                      }</tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}/>
+      <div>
+        <ReactTooltip
+          className="tooltip"
+          arrowColor="transparent"
+        />
+        <header>
+          <div id="results-meta">
+            <span className="n-results">{this.state.table.filter((r) => r.visible).length} results</span>
+            <a className="download-results" onClick={() => this.downloadCsv()}>Download as CSV</a>
           </div>
-        )}/>
-      </Router>
+          <div id="search-filter">
+            <input autoFocus placeholder="Search or filter" type="text" onChange={(ev) => this.updateFilter(ev.target.value)} />
+            <div id="search-help" data-place="left" data-multiline={true} data-tip={SEARCH_HELP}>?</div>
+          </div>
+        </header>
+        <div id="table-container">
+          <table>
+            <tbody>
+              <tr>{this.state.columns.map((c, i) => {
+                let sorting = this.state.sort == c;
+                return <th key={i}
+                    className={sorting ? 'sorting' : ''}>
+                      {this.state.collapsed.includes(c) ?
+                        <div className="column-expand"
+                          data-tip={c}
+                          data-place="bottom"
+                          data-offset="{'top': 15}"
+                          onClick={() => this.expandColumn(c)}>▸</div>
+                        :
+                        <div onClick={() => this.setSort(c)}>
+                          {c}{sorting ? (this.state.sortReverse ? ' ▾' : ' ▴') : ''}
+                          <div className="column-collapse"
+                            onClick={(ev) => this.collapseColumn(ev, c)}>◂</div>
+                        </div>}
+                    </th>
+              })}</tr>
+              {this.state.table.filter((r) => r.visible).map((r, i) => (
+                <tr key={i}>{
+                  this.state.columns.map((c, j) => {
+                    if (this.state.collapsed.includes(c)) {
+                      return <td key={j}></td>
+                    } else if (c == 'references') {
+                      let val = r[c].split('\n')
+                        .filter((url) => url.length > 0)
+                        .map((url, i) => <a className="ref"
+                          key={i}
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer" >{domain(url)}</a>)
+                      return <td key={j}>{val}</td>
+                    } else if (c == 'summary') {
+                      let val = r[c];
+                      if (val.length > MAX_SUMMARY_LENGTH) {
+                        val = `${val.substring(0, MAX_SUMMARY_LENGTH)}...`;
+                      }
+                      return <td data-tip={r[c]} key={j}>{val}</td>
+                    } else {
+                      return <td key={j}>{r[c]}</td>
+                    }
+                  })
+                }</tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
     )
   }
 }
