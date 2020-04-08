@@ -209,6 +209,10 @@ function renderData(data, xScale, all) {
 function setupGantt(table) {
   // Create separate entries for each start date
   let data = table.flatMap((row) => {
+    // If end date is N/A, assume this is
+    // a one-off thing
+    if (row[END_COLUMN] == 'N/A') return [];
+
     // Multiple start dates ok,
     // but only one end date
     let start_dates = parseDates(row[START_COLUMN]);
