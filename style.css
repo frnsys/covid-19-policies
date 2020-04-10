@@ -222,7 +222,7 @@ h5 {
   color: #aaa;
 }
 
-#info p {
+#info p, #about section {
   max-width: 760px;
 }
 
